@@ -1,0 +1,148 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="Keywords" content="blog"/>
+    <meta name="Description" content="blog"/>
+    <title>Simple</title>
+    <link rel="shortcut icon" href="/static/favicon.png"/>
+    <link rel="stylesheet" type="text/css" href="/main.css" />
+</head>
+<body>
+<div class="main">
+    <div class="header">
+    	<ul id="pages">
+            <li><a href="/">home</a></li>
+            <li><a href="/#/tags">tags</a></li>
+            <li><a href="/#/archive">archive</a></li>
+    	</ul>
+    </div>
+	<div class="wrap-header">
+	<h1>
+    <a href="/" id="title"></a>
+	</h1>
+	</div>
+<div id="md" style="display: none;">
+<!-- markdown -->
+今天主要学习下 对象池复用和负载均衡技术以及时间换空间空间换时间思想
+##对象池复用：
+我们知道线程的创建和销毁以及数据库的打开和关闭是十分消耗系统性能的。于是我们就引入了对象池复用技术。当线程完成任务并不会把他销毁，而是把他放入线程池，当另有任务时再从线程池中拿出一个线程完成任务。同理，数据库连接池也是一样，当事务完成时并不会关闭数据库连接池，而是直接把它放入数据库连接池。当另有数据库事务操作池从数据库连接池中再拿出一个数据库连接对象。这样不仅缩短了对象创建的响应时间，而且减轻系统GC压力。无愧为提高系统性能的办法。但这只是相对于重量级对象，要知道new的效率也是不差的。
+##负载均衡技术：
+当系统并发量很大时，一台服务器不足于承担重荷时。这是往往需要多台服务器均衡负载客户端请求。
+下面我们来看下apache的均衡负载：
+![均衡负载](blog_image/jun.png)
+在使用tomcat集群模式时，有黏式session模式和复制式session模式。黏式时所有的session信息被平均分配到到各tomcat服务器，以实现均衡负载。但一旦一个tomcat节点出现问题，它所维护的session信息将消失。且同一用户只能与一个tomcat服务器进行交互，因为其他节点不保存此用户信息。
+而复制式模式时，其使得所有session在所有节点保持一致，当一个节点信息发生改变时，这一节点将向其他节点广播，以此来保证所有节点session信息一致。当用户请求被分配到另一节点，被分配节点将有足够的信息来处理请求。但这样做容易引起网络风暴，影响系统效率。
+Terracotta作为一款跨jvm,是分布式缓存框架。
+Terracotta也可实现tomcat的session共享
+由于Terracotta在进行复制时不会进行全复制，而只是传输变化的部分，这相对于apache来说是一大进步。可以有效避免网络风暴。
+当然Terracotta也可以共享缓存，或者其他对象。
+有关Terracotta体现请到<a>http://terracotta.org/</a>下载
+##时间换空间 ：交换不引用中间变量：
+a=a+b;
+b=a-b;
+a=a-b;
+##空间换时间：缓存是一大表现
+
+<!-- markdown end -->
+</div>
+<div class="entry" id="main">
+<!-- content -->
+<p>今天主要学习下 对象池复用和负载均衡技术以及时间换空间空间换时间思想</p>
+
+<h2>对象池复用：</h2>
+
+<p>我们知道线程的创建和销毁以及数据库的打开和关闭是十分消耗系统性能的。于是我们就引入了对象池复用技术。当线程完成任务并不会把他销毁，而是把他放入线程池，当另有任务时再从线程池中拿出一个线程完成任务。同理，数据库连接池也是一样，当事务完成时并不会关闭数据库连接池，而是直接把它放入数据库连接池。当另有数据库事务操作池从数据库连接池中再拿出一个数据库连接对象。这样不仅缩短了对象创建的响应时间，而且减轻系统GC压力。无愧为提高系统性能的办法。但这只是相对于重量级对象，要知道new的效率也是不差的。</p>
+
+<h2>负载均衡技术：</h2>
+
+<p>当系统并发量很大时，一台服务器不足于承担重荷时。这是往往需要多台服务器均衡负载客户端请求。
+下面我们来看下apache的均衡负载：
+<img title="" alt="均衡负载" src="blog_image/jun.png">
+在使用tomcat集群模式时，有黏式session模式和复制式session模式。黏式时所有的session信息被平均分配到到各tomcat服务器，以实现均衡负载。但一旦一个tomcat节点出现问题，它所维护的session信息将消失。且同一用户只能与一个tomcat服务器进行交互，因为其他节点不保存此用户信息。
+而复制式模式时，其使得所有session在所有节点保持一致，当一个节点信息发生改变时，这一节点将向其他节点广播，以此来保证所有节点session信息一致。当用户请求被分配到另一节点，被分配节点将有足够的信息来处理请求。但这样做容易引起网络风暴，影响系统效率。
+Terracotta作为一款跨jvm,是分布式缓存框架。
+Terracotta也可实现tomcat的session共享
+由于Terracotta在进行复制时不会进行全复制，而只是传输变化的部分，这相对于apache来说是一大进步。可以有效避免网络风暴。
+当然Terracotta也可以共享缓存，或者其他对象。
+有关Terracotta体现请到<a>http://terracotta.org/</a>下载</p>
+
+<h2>时间换空间 ：交换不引用中间变量：</h2>
+
+<p>a=a+b;
+b=a-b;
+a=a-b;</p>
+
+<h2>空间换时间：缓存是一大表现</h2>
+<!-- content end -->
+</div>
+<br>
+<br>
+    <div id="disqus_thread"></div>
+	<div class="footer">
+		<p>© Copyright 2014 by isnowfy, Designed by isnowfy</p>
+	</div>
+</div>
+<script src="main.js"></script>
+<script id="content" type="text/mustache">
+    <h1>{{title}}</h1>
+    <div class="tag">
+    {{date}}
+    {{#tags}}
+    <a href="/#/tag/{{name}}">#{{name}}</a>
+    {{/tags}}
+    </div>
+</script>
+<script id="pagesTemplate" type="text/mustache">
+    {{#pages}}
+    <li>
+        <a href="{{path}}">{{title}}</a>
+    </li>
+    {{/pages}}
+</script>
+<script>
+$(document).ready(function() {
+    $.ajax({
+        url: "main.json",
+        type: "GET",
+        dataType: "json",
+        success: function(data) {
+            $("#title").html(data.name);
+            var pagesTemplate = Hogan.compile($("#pagesTemplate").html());
+            var pagesHtml = pagesTemplate.render({"pages": data.pages});
+            $("#pages").append(pagesHtml);
+            //path
+            var path = "first";
+            //path end
+            var now = 0;
+            for (var i = 0; i < data.posts.length; ++i)
+                if (path == data.posts[i].path)
+                    now = i;
+            var post = data.posts[now];
+            var tmp = post.tags.split(" ");
+            var tags = [];
+            for (var i = 0; i < tmp.length; ++i)
+                if (tmp[i].length > 0)
+                    tags.push({"name": tmp[i]});
+            var contentTemplate = Hogan.compile($("#content").html());
+            var contentHtml = contentTemplate.render({"title": post.title, "tags": tags, "date": post.date});
+            $("#main").prepend(contentHtml);
+            if (data.disqus_shortname.length > 0) {
+                var disqus_shortname = data.disqus_shortname;
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            }
+        }
+    });
+});
+</script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ["\\(", "\\)"]], processEscapes: true}});
+</script>
+</body>
+</html>
